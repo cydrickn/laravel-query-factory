@@ -65,6 +65,6 @@ NoSQL.
 
 ### TODO
 
-* [ ] Add on How to use Laravel Query Factory in README.md
-* [ ] Create Unit Test
-* [ ] Create MockConnectionC
+* Add on How to use Laravel Query Factory in README.md
+* Do 100% code coverage
+* Add unit test for person repository

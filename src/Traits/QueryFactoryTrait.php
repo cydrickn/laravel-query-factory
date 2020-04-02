@@ -2,12 +2,21 @@
 
 namespace LaravelQueryFactory\Traits;
 
+use Illuminate\Database\Query\Builder;
 use LaravelQueryFactory\QueryFactory;
 use LaravelQueryFactory\Facades\QueryFactoryFacade;
 
 trait QueryFactoryTrait
 {
+    /**
+     * @var \LaravelQueryFactory\QueryFactory
+     */
     private $queryFactory;
+
+    public static function getQueryBuilder(): Builder
+    {
+        return (new static)->newBaseQueryBuilder();
+    }
 
     public function setQueryFactory(QueryFactory $queryFactory): self
     {
@@ -18,20 +27,11 @@ trait QueryFactoryTrait
 
     public function getQueryFactory(): QueryFactory
     {
-        if ($this->queryFactory === null) {
-            return QueryFactoryFacade::getFacadeRoot();
+        if ($this->queryFactory instanceof QueryFactory) {
+            return $this->queryFactory;
         }
 
-        return $this->queryFactory;
-    }
-
-    /**
-     * @param \Illuminate\Database\Query\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    protected function newEloquentBuilder($query)
-    {
-        return $this->getQueryFactory()->createEloquentQueryBuilder($this, $this->getConnection());
+        return QueryFactoryFacade::getFacadeRoot();
     }
 
     /**
