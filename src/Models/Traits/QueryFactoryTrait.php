@@ -1,7 +1,8 @@
 <?php
 
-namespace LaravelQueryFactory\Traits;
+namespace LaravelQueryFactory\Models\Traits;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
 use LaravelQueryFactory\QueryFactory;
 use LaravelQueryFactory\Facades\QueryFactoryFacade;
@@ -13,9 +14,9 @@ trait QueryFactoryTrait
      */
     private $queryFactory;
 
-    public static function getQueryBuilder(): Builder
+    public static function newQueryBuilder(?Connection $connection = null): Builder
     {
-        return (new static)->newBaseQueryBuilder();
+        return (new static)->newBaseQueryBuilder($connection);
     }
 
     public function setQueryFactory(QueryFactory $queryFactory): self
@@ -35,11 +36,12 @@ trait QueryFactoryTrait
     }
 
     /**
+     * @param \Illuminate\Database\Connection|null $connection
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function newBaseQueryBuilder()
+    protected function newBaseQueryBuilder(?Connection $connection = null)
     {
-        return $this->getQueryFactory()->createQueryBuilder($this->getConnection());
+        return $this->getQueryFactory()->createQueryBuilder($connection ?? $this->getConnection());
     }
 
     /**

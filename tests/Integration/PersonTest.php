@@ -1,13 +1,11 @@
 <?php
 
-namespace LaravelQueryFactory\Tests\Unit;
+namespace LaravelQueryFactory\Tests\Integration;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use LaravelQueryFactory\Facades\QueryFactoryFacade;
-use LaravelQueryFactory\Tests\Models\Person;
-use LaravelQueryFactory\Tests\TestCase;
-use LaravelQueryFactory\Tests\Traits\MockQueryFactor;
+use LaravelQueryFactory\QueryFactory;
+use LaravelQueryFactory\Traits\MockQueryFactor;
 use Mockery;
 
 class PersonTest extends TestCase
@@ -42,7 +40,7 @@ class PersonTest extends TestCase
     public function testFindWithMockConnection()
     {
         $connection = $this->mockConnection('mysql');
-        $queryBuilder = Person::getQueryBuilder();
+        $queryBuilder = Person::newQueryBuilder();
         $queryBuilder->connection = $connection;
         QueryFactoryFacade::shouldReceive('createQueryBuilder')->andReturn($queryBuilder);
 
@@ -56,7 +54,7 @@ class PersonTest extends TestCase
         $connection = $this->mockConnection('mysql', ['select']);
         $connection->shouldReceive('select')->once()->andReturn([['id' => 1]]);
         $connection->shouldReceive('delete')->once()->andReturn(1);
-        $queryBuilder = Person::getQueryBuilder();
+        $queryBuilder = Person::newQueryBuilder();
         $queryBuilder->connection = $connection;
         $deleteQuery = $queryBuilder->newQuery();
         QueryFactoryFacade::shouldReceive('createQueryBuilder')->andReturn($queryBuilder, $deleteQuery);
@@ -69,5 +67,13 @@ class PersonTest extends TestCase
             $queryBuilder->getGrammar()->compileDelete($queryBuilder)
         );
         $this->assertFalse($person->exists);
+    }
+
+    public function testSetGetQueryBuilder()
+    {
+        $queryFactory = new QueryFactory();
+        $person = new Person();
+        $person->setQueryFactory($queryFactory);
+        $this->assertSame($queryFactory, $person->getQueryFactory());
     }
 }

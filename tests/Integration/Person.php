@@ -1,9 +1,9 @@
 <?php
 
-namespace LaravelQueryFactory\Tests\Models;
+namespace LaravelQueryFactory\Tests\Integration;
 
 use Illuminate\Database\Eloquent\Model;
-use LaravelQueryFactory\Traits\QueryFactoryTrait;
+use LaravelQueryFactory\Models\Traits\QueryFactoryTrait;
 
 class Person extends Model
 {

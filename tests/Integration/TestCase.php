@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelQueryFactory\Tests;
+namespace LaravelQueryFactory\Tests\Integration;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -13,7 +13,7 @@ class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
-        $this->app = require __DIR__.'/../vendor/laravel/laravel/bootstrap/app.php';
+        $this->app = require __DIR__ . '/../../vendor/laravel/laravel/bootstrap/app.php';
 
         $this->app->make(Kernel::class)->bootstrap();
         $this->app->register(QueryFactoryProvider::class);
