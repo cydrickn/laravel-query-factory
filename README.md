@@ -1,5 +1,8 @@
 # Laravel Query Factory
 
+![ci](https://github.com/cydrickn/laravel-query-factory/workflows/.github/workflows/ci/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/cydrickn/laravel-query-factory/badge.svg?branch=master)](https://coveralls.io/github/cydrickn/laravel-query-factory?branch=master)
+
 Laravel Query Factory, is library for you to  easily mock your
 query builder without sending query from real database.
 
@@ -66,4 +69,3 @@ NoSQL.
 ### TODO
 
 * Add on How to use Laravel Query Factory in README.md
-* Add workflow action for github
