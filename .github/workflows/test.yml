@@ -13,7 +13,7 @@ jobs:
         php-versions: ['7.1', '7.2', '7.3', '7.4']
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     env:
-      extensions: pdo, pdo_mysql
+      extensions: pdo, pdo_mysql, mbstring
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: ${{ env.extensions }}
-          coverage: pcov
+          coverage: none
       - name: Validate composer.json and composer.lock
         run: composer validate
       - name: Install dependencies
