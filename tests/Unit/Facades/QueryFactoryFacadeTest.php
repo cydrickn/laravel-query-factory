@@ -2,14 +2,13 @@
 
 namespace LaravelQueryFactory\Tests\Unit\Facacdes;
 
-use Illuminate\Foundation\Application;
 use LaravelQueryFactory\Facades\QueryFactoryFacade;
 use LaravelQueryFactory\QueryFactory;
 use LaravelQueryFactory\Tests\Unit\TestCase;
 
 class QueryFactoryFacadeTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         QueryFactoryFacade::setFacadeApplication(null);
     }

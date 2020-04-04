@@ -12,7 +12,7 @@ use Mockery;
 
 class QueryFactoryTraitTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         QueryFactoryFacade::setFacadeApplication(null);
     }
