@@ -5,12 +5,12 @@ namespace LaravelQueryFactory\Tests\Integration;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use LaravelQueryFactory\Facades\QueryFactoryFacade;
 use LaravelQueryFactory\QueryFactory;
-use LaravelQueryFactory\Traits\MockQueryFactor;
+use LaravelQueryFactory\Traits\MockQueryFactory;
 use Mockery;
 
 class PersonTest extends TestCase
 {
-    use MockQueryFactor;
+    use MockQueryFactory;
 
     public function testFindWithRefuse()
     {

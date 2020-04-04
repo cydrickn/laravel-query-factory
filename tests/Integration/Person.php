@@ -10,9 +10,7 @@ class Person extends Model
     use QueryFactoryTrait;
 
     protected $fillable = [
-        'id',
         'name',
-        'birthDate',
         'gender',
     ];
 }

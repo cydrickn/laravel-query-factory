@@ -1,5 +1,7 @@
 # Laravel Query Factory
 
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/cydrickn/laravel-query-factory.svg)](https://packagist.org/packages/cydrickn/laravel-query-factory)
+[![Software License](https://img.shields.io/packagist/l/cydrickn/laravel-query-factory.svg)](/LICENSE)
 ![ci](https://github.com/cydrickn/laravel-query-factory/workflows/ci/badge.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/cydrickn/laravel-query-factory/badge.svg?branch=master)](https://coveralls.io/github/cydrickn/laravel-query-factory?branch=master)
 
@@ -9,7 +11,7 @@ query builder without sending query from real database.
 The library is to use for developers who really follow the Automating Testing,
 The unit test is the most low level where you need tto test your whole system.
 
-### Problem want to solve by this Library
+### Problem that want to solve by this Library
 
 In laravel is one of the problem, where most of the tutorials and even
 in document of laravel, the testing is mostly focusing in integration, api and acceptance.
@@ -66,6 +68,147 @@ The answer is dont use sqlite for test to just satisfy your unit test, Why?
 * Not all sql query can handler my sqlite, each database driver have different syntax, especially if you are using
 NoSQL.
 
-### TODO
+### Classes and Traits
 
-* Add on How to use Laravel Query Factory in README.md
+|Class|Description|
+|-----|-----------|
+|LaravelQueryFactory\Facades\QueryFactoryFacade|A class for facade use by laravel and lumen|
+|LaravelQueryFactory\QueryFactory|The main service that will generate query builder|
+|LaravelQueryFactory\QueryFactoryProvider|Provider that will register the `LaravelQueryFactory\QueryFactory` as `query-factory`|
+
+|Trait|Description|
+|-----|-----------|
+|LaravelQueryFactory\Models\Traits\QueryFactoryTrait|Trait that can use by the model to replace the default `newBaseQueryBuilder`|
+|LaravelQueryFactory\Traits\MockQueryFactory|A trait use for testing, to mock connection and pdo|
+
+### How to use
+
+Model will just use the `LaravelQueryFactory\Models\Traits\QueryFactoryTrait` this will use the facade or you can also
+set the QueryFactory using by calling `setQueryFactory`
+
+Person Model
+- Adding `QueryFactoryTrait` to your model, this will replace the current generation of Query Builder
+using `QueryFactoryFacade` so that you can mock it.
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use LaravelQueryFactory\Models\Traits\QueryFactoryTrait;
+
+class Person extends Model
+{
+    use QueryFactoryTrait;
+
+    protected $fillable = ['name', 'gender'];
+}
+```
+
+Person Repository
+- Just do your normal service/repository
+```php
+<?php
+
+namespace App\Repository;
+
+use App\Models\Person;
+use Illuminate\Support\Collection;
+
+class PersonRepository
+{
+    public function findById(): ?Person
+    {
+        return Person::find(1);
+    }
+    
+    public function findByGender(string $gender): Collection
+    {
+        return Person::where('gender', '=', $gender)->get();       
+    }   
+}
+```
+
+Unit Test
+```php
+<?php
+
+namespace App\Tests\Unit;
+
+use LaravelQueryFactory\Traits\MockQueryFactory;
+use LaravelQueryFactory\Facades\QueryFactoryFacade;
+
+class PersonRepositoryTest extends TestCase
+{
+    use MockQueryFactory;
+
+    /**
+     * Test by just using mock connection and QueryFacades
+     * and you can assert the generated sql.
+     */
+    public function testFindWithGeneratedSql()
+    {
+        $connection = $this->mockConnection('mysql');
+        $queryBuilder = Person::newQueryBuilder();
+        $queryBuilder->connection = $connection;
+        QueryFactoryFacade::shouldReceive('createQueryBuilder')->andReturn($queryBuilder);
+
+        $repository = new PersonRepository();
+        $repository->findById(1);
+        $this->assertSame('select * from `people` where `people`.`id` = ? limit 1', $queryBuilder->toSql());
+        $this->assertSame([1], $queryBuilder->getBindings());
+    }
+
+    /**
+     * Test by mocking connection with result and QueryFacades
+     */
+    public function testFindWithResult()
+    {
+        $connection = $this->mockConnection('mysql');
+
+        // Mock result from connection
+        $connection->shouldReceive('select')->once()->andReturn([['id' => 1]]);
+
+        $queryBuilder = Person::newQueryBuilder();
+        $queryBuilder->connection = $connection;
+        QueryFactoryFacade::shouldReceive('createQueryBuilder')->andReturn($queryBuilder);
+
+        $repository = new PersonRepository();
+        $person = $repository->findById(1);
+        $this->assertInstanceOf(Person::class, $person);
+    }
+
+    /**
+     * Test by mocking query builder
+     */
+    public function testFindByGenderWithMockingQueryBuilder()
+    {
+        $connection = $this->mockConnection('mysql');
+        
+        // Mocking Query Builder
+        $queryBuilder = Mockery::mock(QueryBuilder::class);
+        $queryBuilder->shouldReceive('getConnection')->andReturn($connection);
+        $queryBuilder->shouldReceive('from')->with('people')->andReturnSelf();
+        $queryBuilder->shouldReceive('where')->once()->with('gender', '=', 'male')->andReturnSelf();
+        $queryBuilder->shouldReceive('get')->once()->with(['*'])->andReturnSelf();
+        $queryBuilder->shouldReceive('all')
+            ->once()
+            ->withNoArgs()
+            ->andReturn([['id' => 1, 'gender' => 'male']]);
+
+        QueryFactoryFacade::shouldReceive('createQueryBuilder')->andReturn($queryBuilder);
+
+        $repository = new PersonRepository();
+        $persons = $repository->findByGender('male');
+        $this->assertSame(1, $persons->first()->id);
+    }
+}
+```
+
+### Conclusion
+
+Using this library (Laravel Query Factory) you can now mock your query builders.
+By mocking the connection will mock the connection so that it will not connect to database.
+
+
+

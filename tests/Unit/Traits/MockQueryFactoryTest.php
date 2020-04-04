@@ -4,9 +4,11 @@ namespace LaravelQueryFactory\Tests\Unit\Traits;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\SqlServerConnection;
 use LaravelQueryFactory\Tests\Unit\TestCase;
-use LaravelQueryFactory\Traits\MockQueryFactor;
+use LaravelQueryFactory\Traits\MockQueryFactory;
 use Mockery;
 use Mockery\MockInterface;
 use PDO;
@@ -40,10 +42,12 @@ class MockQueryFactoryTest extends TestCase
     {
         yield ['mysql', MySqlConnection::class];
         yield ['sqlite', SQLiteConnection::class];
+        yield ['postgres', PostgresConnection::class];
+        yield ['sqlserver', SqlServerConnection::class];
     }
 
     private function mockTrait()
     {
-        return Mockery::mock(MockQueryFactor::class)->makePartial();
+        return Mockery::mock(MockQueryFactory::class)->makePartial();
     }
 }
