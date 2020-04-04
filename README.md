@@ -83,11 +83,33 @@ NoSQL.
 
 ### How to use
 
+#### Installing
+
+```bash
+composer require cydrickn/laravel-query-factory
+```
+
+
+#### Register the Provider
+
+The configuration can be found to `config/app.php`.
+
+To register your provider, add it to the array:
+
+```php
+'providers' => [
+    // Other Service Providers
+
+   LaravelQueryFactory\QueryFactoryProvider::class,
+];
+```
+
+#### Creating Model
+
 Model will just use the `LaravelQueryFactory\Models\Traits\QueryFactoryTrait` this will use the facade or you can also
 set the QueryFactory using by calling `setQueryFactory`
 
-Person Model
-- Adding `QueryFactoryTrait` to your model, this will replace the current generation of Query Builder
+Adding `QueryFactoryTrait` to your model, this will replace the current generation of Query Builder
 using `QueryFactoryFacade` so that you can mock it.
 ```php
 <?php
@@ -105,8 +127,13 @@ class Person extends Model
 }
 ```
 
+#### Creating Repository/Service
+
+Creating repository or service is just you normal service.
+It's your choice if you will inject `LaravelQueryFactory\QueryFactory`,
+but in this example we will not since we use the default QueryFactory from our facades.
+
 Person Repository
-- Just do your normal service/repository
 ```php
 <?php
 
@@ -129,7 +156,21 @@ class PersonRepository
 }
 ```
 
-Unit Test
+#### Creating Unit Test
+
+For our unit test you need to use `LaravelQueryFactory\Traits\MockQueryFactory`.
+This trait will mock the connection class use by laravel so that it will not connect to any type of database.
+
+for function `mockConnection` it is accepting:
+- mysql
+- postgres
+- sqlite
+- sqlserver
+
+Why we need to specify this drivers? so that you can get the generated query for test, since every driver has
+different queries on how they convert your query builder.
+But I suggest that you use the driver use by your system, so that you can really check your expectation sql.
+
 ```php
 <?php
 
