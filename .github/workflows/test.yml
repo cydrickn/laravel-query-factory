@@ -28,4 +28,4 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
       - name: Run Test and Coverage
-        run: php ./vendor/bin/phpunit --coverage-text --coverage-clover coverage.xml
+        run: phpdbg -rrq ./vendor/bin/phpunit --coverage-text --coverage-clover coverage.xml
